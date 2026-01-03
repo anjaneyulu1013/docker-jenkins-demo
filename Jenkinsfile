@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "springboot-docker-jenkin-demo"
         CONTAINER_NAME = "springboot-docker-jenkin-demo-container"
+        SONAR_TOKEN = credentials('sonar-token')
     }
 
     stages {
@@ -16,10 +17,12 @@ pipeline {
         }
 
         stage('Build Maven') {
-            steps {
-                sh 'chmod +x mvnw'
-                sh './mvnw clean package -DskipTests'
-            }
+             steps {
+                            sh '''
+                            ./mvnw clean verify sonar:sonar \
+                            -Dsonar.login=$SONAR_TOKEN
+                            '''
+                        }
         }
 
         stage('Build Docker Image') {
