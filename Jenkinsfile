@@ -23,14 +23,16 @@ pipeline {
                     }
                 }
 
-        stage('Build Maven and SonarQube') {
-             steps {
-                            sh '''
-                            ./mvnw clean verify sonar:sonar \
-                            -Dsonar.login=$SONAR_TOKEN
-                            '''
-                        }
-        }
+         stage('Build & Sonar Analysis') {
+                    steps {
+                        sh """
+                        ./mvnw clean verify sonar:sonar \
+                        -Dsonar.projectKey=springboot-demo \
+                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
+                        """
+                    }
+                }
 
         stage('Build Docker Image') {
             steps {
@@ -58,4 +60,12 @@ pipeline {
             }
         }
     }
+     post {
+            success {
+                echo "✅ Pipeline executed successfully"
+            }
+            failure {
+                echo "❌ Pipeline failed"
+            }
+        }
 }
