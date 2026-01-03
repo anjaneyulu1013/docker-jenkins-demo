@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "springboot-docker-jenkin-demo"
         CONTAINER_NAME = "springboot-docker-jenkin-demo-container"
+        SONAR_HOST_URL = "http://sonarqube:9000"
         SONAR_TOKEN = credentials('sonar-token')
     }
 
@@ -16,7 +17,13 @@ pipeline {
             }
         }
 
-        stage('Build Maven') {
+        stage('Grant Permission') {
+                    steps {
+                        sh 'chmod +x mvnw'
+                    }
+                }
+
+        stage('Build Maven and SonarQube') {
              steps {
                             sh '''
                             ./mvnw clean verify sonar:sonar \
