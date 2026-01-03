@@ -4,8 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "springboot-docker-jenkin-demo"
         CONTAINER_NAME = "springboot-docker-jenkin-demo-container"
-        SONAR_HOST_URL = "http://sonarqube:9000"
-        SONAR_TOKEN = credentials('sonar-token')
+
     }
 
     stages {
@@ -23,16 +22,16 @@ pipeline {
                     }
                 }
 
-         stage('Build & Sonar Analysis') {
-                    steps {
-                        sh """
-                        ./mvnw clean verify sonar:sonar \
-                        -Dsonar.projectKey=springboot-demo \
-                        -Dsonar.host.url=${SONAR_HOST_URL} \
-                        -Dsonar.login=${SONAR_TOKEN}
-                        """
-                    }
-                }
+          stage('Build & Sonar Analysis') {
+                     steps {
+                         withSonarQubeEnv('sonarqube-local') {
+                             sh '''
+                                 ./mvnw clean verify sonar:sonar \
+                                 -Dsonar.projectKey=springboot-demo
+                             '''
+                         }
+                     }
+                 }
 
         stage('Build Docker Image') {
             steps {
